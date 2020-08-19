@@ -7,9 +7,138 @@ const { route } = require('./Home-work-route');
 const verifyToken = require('./verifyToken');
 const nodemailer = require('nodemailer');
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.ethereal.email',
+  port: 587,
+  auth: {
+    user: process.env.EMAIL_SERVER_EMAIL,
+    pass: process.env.EMAIL_SERVER_PASSWORD
+  }
+});
+
+let message = { 
+from: 'Jim.orberg@gmail.com', 
+to: 'jasmin.padberg85@ethereal.email',
+subject: 'welcome to the jungle',
+text: 'this is dummy thicc text that will be read in the actual email',
+html: '<p>this is dummy thicc text that will be read in the actual email</p>'
+};
+
+auth.post('/send-email', (req,res,next) =>{
+  transporter.sendMail(message, (err, info) =>{
+    if (err) return res.json({ error: err.message });
+    res.json({ response: info.messageId });
+    next();
+  });
+});
+
+auth.post('/forgot-password', async (req, res, next) => {
+  const userName = req.body.userName;
+  try {
+    const user = await Login.findOne({ userName });
+    if (!user) {
+      return res.status(400).json({
+        messageWrapper: {
+          message: 'no user found, please make sure your username is correct',
+          messageType: 'error'
+        }
+      });
+    } else {
+      const passwordResetToken = Math.random().toString(36).slice(-8);
+
+      const update = {
+        userName: user.userName,
+        userPassword: user.userPassword,
+        passwordResetToken
+      };
+
+      const option = {
+        new: true
+      };
+
+      Login.findOneAndUpdate(userName, update, option)
+        .then((data) => {
+          const toEmail = user.userEmail;
+
+          let message = {
+            from: 'jim.orberg@gmail.com',
+            to: toEmail,
+            subject: 'Reset your password',
+            text: ` use this token to reset your password ${passwordResetToken}`,
+            html: ` <p>use this token to reset your password <strong>${passwordResetToken}</strong></p>`
+          };
+
+          transporter.sendMail(message, (err, info) => {
+            // add a message wrapper here for the client
+            if (err) return res.json({ error: err.message });
+
+            res.json({
+              messageWrapper: {
+                message: ' please check your inbox for a reset password token',
+                messageType: 'success'
+              },
+              data
+            });
+            next();
+          });
+        })
+        .catch((err) => {
+          res.send(err);
+          next();
+        });
+    }
+  } catch (err) {
+    res.send(err);
+  }
+});
+
+auth.post('/reset-password', async (req, res, next) => {
+  const passwordResetToken = req.body.resetToken,
+    newPassword = req.body.newPassword;
+  try {
+    const user = await Login.findOne({ passwordResetToken });
+
+    const saltRounds = 10;
+    bcrypt.genSalt(saltRounds, (err, salt) => {
+      bcrypt.hash(newPassword, salt, (err, hash) => {
+        const userName = user.userName;
+
+        const update = {
+          userPassword: hash,
+          passwordResetToken: ''
+        };
+        const option = {
+          new: true
+        };
+
+        // res.json({ update });
+        Login.findOneAndUpdate(userName, update, option)
+          .then((data) => {
+            res.status(200).json({
+              messageWrapper: {
+                message:
+                  'your password has successfully been changed. please login',
+                messageType: 'success'
+              },
+              data
+            });
+          })
+          .catch((err) => {
+            res.send(err);
+          });
+      });
+    });
+  } catch (err) {
+    res.send(err);
+  }
+});
 
 auth.post('/register', async (req, res, next) => { 
   const userName = req.body.userName,
+  userEmail = req.body.userEmail,
   userPassword = req.body.userPassword;
   
   const user = await Login.findOne({ userName });
@@ -18,7 +147,8 @@ auth.post('/register', async (req, res, next) => {
   
   bcrypt.hash(userPassword, saltRounds).then(function(hash) {
       const newLogin = new Login({
-          userName: userName,         
+          userName,
+          userEmail,    
           userPassword: hash
       });
       newLogin
@@ -98,51 +228,6 @@ auth.post('/register', async (req, res, next) => {
       });
   });
   
-  auth.post('/email', async (req, res, next) => {
-
-   let transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_SERVER_HOST,
-      port: process.env.EMAIL_SERVER_PORT,
-      secure:false,
-      tls: {
-        rejectUnauthorized: false
-      },
-
-      auth: {
-          user: process.env.EMAIL_SERVER_EMAIL, 
-          pass: process.env.EMAIL_SERVER_PASSWORD 
-      },
-      debug: true, 
-      logger: true 
-    });
-
-  let info = await transporter.sendMail({
-    from: '"James Öhrberg" <Jim.orberg@gmail.com>',
-    to: "jasmin.padberg85@ethereal.email",
-    subject: "Test email", 
-    text: "This is the actual text in the email",
-});
-
-  res.status(200).json({
-    messageWrapper: {
-      message: 'Email sent',
-      messageType: 'success'
-    },
-    info
-  })
-  .catch((err) => {
-    res.status(400).json({
-      messageWrapper: {
-        message: 'Sorry, could not send the email',
-        messageType: 'error',
-        error: err
-      }
-    });
-  });
-
-  next();
-  });
-
   auth.post("/test-token", verifyToken, (req, res, next) => {
     res.json({
       data: req.user.userId
@@ -195,7 +280,7 @@ auth.post('/register', async (req, res, next) => {
     const authToken = jwt.sign(
       { userId },
        process.env.JWT_AUTH_TOKEN_SECRET,
-        { expiresIn: "10m"}
+        { expiresIn: "60m"}
         );
     return authToken;
   }
