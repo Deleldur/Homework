@@ -5,6 +5,7 @@ const userSchema = new Schema({
   userName: String,
   userPassword: String,
   userEmail: String,
+  passwordResetToken: String,
   creationDate: { type: Date, default: Date.now }
 });
 

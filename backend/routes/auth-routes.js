@@ -98,9 +98,17 @@ auth.post('/forgot-password', async (req, res, next) => {
 auth.post('/reset-password', async (req, res, next) => {
   const passwordResetToken = req.body.resetToken,
     newPassword = req.body.newPassword;
+    
   try {
     const user = await Login.findOne({ passwordResetToken });
-
+    if (!user) {
+      return res.json({
+        messageWrapper: {
+          message: 'no user found, please make sure your username is correct',
+          messageType: 'error'
+        }
+      });
+    }
     const saltRounds = 10;
     bcrypt.genSalt(saltRounds, (err, salt) => {
       bcrypt.hash(newPassword, salt, (err, hash) => {
@@ -131,6 +139,7 @@ auth.post('/reset-password', async (req, res, next) => {
           });
       });
     });
+    
   } catch (err) {
     res.send(err);
   }
