@@ -1,7 +1,7 @@
 {
   "name": "module2",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is my repo for school work",
   "main": "app.js",
   "scripts": {
     "run-server": "nodemon backend/app.js"
