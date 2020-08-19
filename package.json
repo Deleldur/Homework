@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leegould119/module2.git"
+    "url": "git+https://github.com/Deleldur/Homework.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/leegould119/module2/issues"
+    "url": "https://github.com/Deleldur/Homework/issues"
   },
-  "homepage": "https://github.com/leegould119/module2#readme",
+  "homepage": "https://github.com/Deleldur/Homework#readme",
   "dependencies": {
     "bcrypt": "^5.0.0",
     "crypto-js": "^4.0.0",
