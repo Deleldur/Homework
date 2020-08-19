@@ -1,0 +1,31 @@
+{
+  "name": "module2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "run-server": "nodemon backend/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leegould119/module2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leegould119/module2/issues"
+  },
+  "homepage": "https://github.com/leegould119/module2#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "crypto-js": "^4.0.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.27",
+    "nodemailer": "^6.4.11"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
