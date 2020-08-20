@@ -17,21 +17,13 @@ const transporter = nodemailer.createTransport({
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
-let message = { 
-from: 'Jim.orberg@gmail.com', 
-to: 'jasmin.padberg85@ethereal.email',
-subject: 'welcome to the jungle',
-text: 'this is dummy thicc text that will be read in the actual email',
-html: '<p>this is dummy thicc text that will be read in the actual email</p>'
-};
-
 auth.post('/send-email', (req,res,next) =>{
-  // const 
-  // from = req.body.from,
-  // to = req.body.to,
-  // subject = req.body.subject,
-  // text = req.body.text;
-
+  let message = {
+    from: req.body.from,
+    to: req.body.to,
+    subject: req.body.subject,
+    text: req.body.text
+    }
   transporter.sendMail(message, (err, info) =>{
     if (err) return res.json({ error: err.message });
     res.json({ message: "Email has been sent" });
