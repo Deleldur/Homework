@@ -1,10 +1,8 @@
 const profile = require("express").Router();
 
 const ProfileSchema = require("../schemas/Home-work-schema");
-// const { response } = require("express");
 
 
-// Create new profile
 profile.post("/add-new-profile", (req, res, next) => {
 
   const newProfile = new ProfileSchema({
@@ -52,8 +50,6 @@ profile.post("/add-new-profile", (req, res, next) => {
   });
 });
 
-
-// Find the user by ID
 profile.get('/find-profile/:userId', (req, res, next) => {
     const userId = req.params.userId;
     ProfileSchema.findById(userId)
@@ -86,8 +82,6 @@ profile.get('/find-profile/:userId', (req, res, next) => {
       });
 });
 
-
-// Get ALL profiles
 profile.get('/get-all-profiles', (req, res, next) => {
   ProfileSchema.find({}).then((profile) => {
     res
@@ -112,8 +106,6 @@ profile.get('/get-all-profiles', (req, res, next) => {
       });
 });
 
-
-// Delete a user by ID
 profile.delete('/delete-user-by-id/:userId', (req, res, next) => {
   const userId = req.param('userId'); 
   ProfileSchema.findByIdAndDelete(userId)
@@ -149,10 +141,7 @@ profile.delete('/delete-user-by-id/:userId', (req, res, next) => {
     });
   });
 
-
-
-
-   profile.get('/find-userprofile-by-name', (req, res, next) => {
+profile.get('/find-userprofile-by-name', (req, res, next) => {
    const firstName = req.param('firstName');
 
   console.log(firstName);
@@ -194,8 +183,6 @@ profile.delete('/delete-user-by-id/:userId', (req, res, next) => {
   }
 });
 
-
-// Uppdate the user profile
 profile.put('/update-user-profile/:userId', (req, res, next) => {
 
   const userId = req.params.userId;
@@ -253,9 +240,7 @@ profile.put('/update-user-profile/:userId', (req, res, next) => {
       });
   });
 
-
-// delete by parmeter
-profile.delete('/delete-by-name', (req, res, next) => {
+  profile.delete('/delete-by-name', (req, res, next) => {
   const lastName = req.param('lastName');
   ProfileSchema.deleteMany({ lastName: { $regex: new RegExp("^" + lastName.toLowerCase(), "i") } })
     .then((response) => {

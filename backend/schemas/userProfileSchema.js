@@ -14,6 +14,12 @@ const SocialLinksSchema = new Schema(
 );
 
 const userProfileSchema = new Schema({
+    
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "logins"
+    },
+
     firstName: {
         type:String
     },

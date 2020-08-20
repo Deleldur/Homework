@@ -88,10 +88,6 @@ router.get('/get-all-users', (req, res, next) => {
     });
 });
 
-
-// idag 08-07
-
-
 router.get("/find-user-by-name", (req, res, next) => {
     const firstName = req.param('firstname');
 
@@ -126,13 +122,9 @@ router.get("/find-user-by-name", (req, res, next) => {
               err
           });
       });
-  });
+});
 
-  
-  
- 
-
-  router.delete('/delete-user-by-id', (req, res, next) => {
+router.delete('/delete-user-by-id', (req, res, next) => {
       const userId = req.params.userId;
       Profile.findByIdAndDelete(serId)
 
@@ -165,10 +157,9 @@ router.get("/find-user-by-name", (req, res, next) => {
           })
       });
       
-  })
+});
 
-
-  router.post('update-user-profile', (req, res, next) => {
+router.post('update-user-profile', (req, res, next) => {
 
     const userId = req.params.userId;
     
@@ -207,7 +198,74 @@ router.get("/find-user-by-name", (req, res, next) => {
                 },
             })
         });
-    });
+});
+
+router.get('/find-user-by-name', (req, res, next) => {
+        const firstName = req.param('firstName');
+        const lastName = req.param('lastName');
+      
+        console.log(firstName);
+        console.log(lastName);
+        if (!firstName && !lastName) {
+          res.status(400).json({
+            message: 'no users defined, please make sure you send in the right data'
+          });
+        } else if (!firstName) {
+          Profile.find({ lastName: lastName })
+            .then((resp) => {
+              res.send(resp);
+              next();
+            })
+            .catch((err) => {
+              res.send(err);
+              next();
+            });
+        } else if (!lastName) {
+          Profile.find({ firstName: firstName })
+            .then((resp) => {
+              res.send(resp);
+              next();
+            })
+            .catch((err) => {
+              res.send(err);
+              next();
+            });
+        } else {
+          Profile.find({ firstName: firstName, lastName: lastName })
+            .then((resp) => {
+              res.send(resp);
+              next();
+            })
+            .catch((err) => {
+              res.send(err);
+              next();
+            });
+        }
+});
+
+router.post('/delete-by-name', (req, res, next) => {
+    const name = req.param('name');
+  
+    Profile.deleteMany({ lastName: name })
+      .then((response) => {
+        res.status(200).send({
+          messageWrapper: {
+            message: 'data suceesfully deleted',
+            messageType: 'success'
+          },
+          data: response
+        });
+      })
+      .catch((err) => {
+        res.status(400).send({
+          messageWrapper: {
+            message: 'there seems to be an error, please try agaain later.',
+            messageType: 'error',
+            error: err
+          }
+        });
+      });
+});
 
   
 

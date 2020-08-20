@@ -6,10 +6,6 @@ const jwt = require('jsonwebtoken');
 const { route } = require('./Home-work-route');
 const verifyToken = require('./verifyToken');
 const nodemailer = require('nodemailer');
-
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-
-
 const transporter = nodemailer.createTransport({
   host: 'smtp.ethereal.email',
   port: 587,
@@ -18,6 +14,8 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_SERVER_PASSWORD
   }
 });
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
 let message = { 
 from: 'Jim.orberg@gmail.com', 
@@ -28,9 +26,15 @@ html: '<p>this is dummy thicc text that will be read in the actual email</p>'
 };
 
 auth.post('/send-email', (req,res,next) =>{
+  // const 
+  // from = req.body.from,
+  // to = req.body.to,
+  // subject = req.body.subject,
+  // text = req.body.text;
+
   transporter.sendMail(message, (err, info) =>{
     if (err) return res.json({ error: err.message });
-    res.json({ response: info.messageId });
+    res.json({ message: "Email has been sent" });
     next();
   });
 });
@@ -42,7 +46,7 @@ auth.post('/forgot-password', async (req, res, next) => {
     if (!user) {
       return res.status(400).json({
         messageWrapper: {
-          message: 'no user found, please make sure your username is correct',
+          message: 'No user by that name found',
           messageType: 'error'
         }
       });
@@ -64,20 +68,20 @@ auth.post('/forgot-password', async (req, res, next) => {
           const toEmail = user.userEmail;
 
           let message = {
-            from: 'jim.orberg@gmail.com',
+            from: 'Big.Fat.Corperation.INC@gmail.com',
             to: toEmail,
             subject: 'Reset your password',
-            text: ` use this token to reset your password ${passwordResetToken}`,
-            html: ` <p>use this token to reset your password <strong>${passwordResetToken}</strong></p>`
+            text: ` For fucks sake stop forgetting your password you twat! ${passwordResetToken}`,
+            html: ` <p>For fucks sake stop forgetting your password you twat! <strong>${passwordResetToken}</strong></p>`
           };
 
           transporter.sendMail(message, (err, info) => {
-            // add a message wrapper here for the client
+            
             if (err) return res.json({ error: err.message });
 
             res.json({
               messageWrapper: {
-                message: ' please check your inbox for a reset password token',
+                message: ' Check your email for the reset link ',
                 messageType: 'success'
               },
               data
@@ -99,12 +103,13 @@ auth.post('/reset-password', async (req, res, next) => {
   const passwordResetToken = req.body.resetToken,
     newPassword = req.body.newPassword;
     
+    
   try {
     const user = await Login.findOne({ passwordResetToken });
     if (!user) {
       return res.json({
         messageWrapper: {
-          message: 'no user found, please make sure your username is correct',
+          message: ' Expired token or invalid token ',
           messageType: 'error'
         }
       });
@@ -122,7 +127,6 @@ auth.post('/reset-password', async (req, res, next) => {
           new: true
         };
 
-        // res.json({ update });
         Login.findOneAndUpdate(userName, update, option)
           .then((data) => {
             res.status(200).json({
@@ -293,5 +297,5 @@ auth.post('/register', async (req, res, next) => {
         );
     return authToken;
   }
-
+  
   module.exports = auth;

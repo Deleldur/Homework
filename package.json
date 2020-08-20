@@ -4,7 +4,8 @@
   "description": "This is my repo for school work",
   "main": "app.js",
   "scripts": {
-    "run-server": "nodemon backend/app.js"
+    "run-server": "nodemon backend/app.js",
+    "run-auth-server": "nodemon backend/authServer.js"
   },
   "repository": {
     "type": "git",
